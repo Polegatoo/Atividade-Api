@@ -1,0 +1,13 @@
+# ambiente virtual
+venv/
+.env/
+
+# cache python
+__pycache__/
+*.pyc
+
+# configs do VS Code
+.vscode/
+
+# configs de IDE (tipo PyCharm, se vc abrir lá depois)
+.idea/
