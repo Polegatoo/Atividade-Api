@@ -1,33 +1,29 @@
-name: Deploy FastAPI and Flask to Azure App Service
+name: Deploy FastAPI to Azure App Service (DeployeTestesdasAPIsPY)
 
 on:
   push:
     branches: [ main ]
 
 env:
-  PY_VERSION: '3.11'
-
-  # Preencha com os nomes reais dos seus App Services no Azure
-  APP_NAME_FASTAPI: SEU_APP_SERVICE_FASTAPI        # exemplo: api-fastapi-prod
-  APP_NAME_FLASK:   SEU_APP_SERVICE_FLASK          # exemplo: api-flask-prod
-
-  # Preencha com os NOMES dos secrets que você criará no GitHub
-  SECRET_FASTAPI:   AZURE_PUBLISH_FASTAPI
-  SECRET_FLASK:     AZURE_PUBLISH_FLASK
+  API_DIR: fastapi_api
+  PY_VERSION: '3.12'
+  AZURE_APP_NAME: DeployeTestesdasAPIsPY
+  AZURE_PUBLISH_SECRET: AZUREAPPSERVICE_PUBLISHPROFILE
 
 jobs:
-  fastapi:
-    name: Build and deploy FastAPI
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PY_VERSION }}
 
-      - name: Install deps
-        working-directory: fastapi_api
+      - name: Install dependencies
+        working-directory: ${{ env.API_DIR }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -35,29 +31,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.APP_NAME_FASTAPI }}
-          publish-profile: ${{ secrets[env.SECRET_FASTAPI] }}
-          package: fastapi_api
-
-  flask:
-    name: Build and deploy Flask
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PY_VERSION }}
-
-      - name: Install deps
-        working-directory: flask_api
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.APP_NAME_FLASK }}
-          publish-profile: ${{ secrets[env.SECRET_FLASK] }}
-          package: flask_api
+          app-name: ${{ env.AZURE_APP_NAME }}
+          publish-profile: ${{ secrets[env.AZURE_PUBLISH_SECRET] }}
+          package: ${{ env.API_DIR }}
